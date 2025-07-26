@@ -20,8 +20,17 @@ const userDetail = async (id) => {
     throw error || { message: "can't get details of a a user" };
   }
 };
-
+export const deleteUser = async (userId) => {
+  try {
+    const response = await axiosInstance.delete(`${API_PATHS.DELETE_USER}/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
 export const userServices = {
   userFetch: userFetch,
   userDetail: userDetail,
+  deleteUser:deleteUser
 };

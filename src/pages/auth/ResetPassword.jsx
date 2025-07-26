@@ -2,13 +2,17 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { authServices } from "../../service/authServices";
-import { toast } from "react-toastify";
+
+
+import { useDispatch } from "react-redux";
+import { resetPassword } from "../../features/auth/resetPassSlice";
+import { Toast } from "../../components/toastComponent";
 
 export const ResetPassword = () => {
   const navigate = useNavigate();
   const [resetPass, setResetPass] = useState("");
   const { userId, authToken } = useParams();
+  const dispatch = useDispatch();
 
   const rawBody = {
     password: resetPass,
@@ -18,13 +22,14 @@ export const ResetPassword = () => {
 
   const handleReset = async () => {
     try {
-      const result = await authServices.resetPassword(rawBody);
-      toast.success("password reset successfully")
-      console.log(result);
+        dispatch(resetPassword(rawBody))
+       
+      // toast.success("password reset successfully")
+       Toast("success","password reset successfully")
       navigate("/");
     } catch (error) {
       console.log(error);
-    }
+    } 
   };
 
   return (

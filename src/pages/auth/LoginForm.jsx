@@ -5,14 +5,20 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { Modal } from "bootstrap";
 
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Typography } from "@material-tailwind/react";
-import { authServices } from "../../service/authServices";
 
-export const Login = ({ onSuccess }) => {
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../features/auth/loginSlice";
+import { forgetPassword } from "../../features/auth/forgetPassSlice";
+import CommonButton from "../../components/button";
+import { Toast } from "../../components/toastComponent";
+
+export const Login = () => {
   const navigate = useNavigate();
   const [forgotEmail, setForgotEmail] = useState("");
+  const dispatch = useDispatch();
   const modalRef = useRef();
 
   const initialState = {
@@ -34,49 +40,23 @@ export const Login = ({ onSuccess }) => {
   };
 
   const handleSave = async (values) => {
-    try {
-      const body = {
-        email: values.email,
-        password: values.password,
-      };
+    const body = {
+      email: values.email,
+      password: values.password,
+    };
 
-      const result = await authServices.LoginUser(body);
-      console.log(result);
-
-      if (result.message === "success") {
-        const token = result.data.token;
-        toast.success(`Welcome Back ${result.data.name}`);
-        localStorage.setItem("authToken", token);
-        onSuccess(token);
-      } else {
-        toast.error(result.message || "Login failed");
-      }
-    } catch (e) {
-      console.error("Login error:", e);
-      if (e) {
-        const message = e.message || "An error occurred during login";
-        console.log(message);
-        if (message === "Email is not verified") {
-          toast.error("Please verify your email first");
-        } else if (message === "Invalid credentials") {
-         
-          
-          toast.error("Incorrect credentials");
-        } else {
-          toast.error("Login failed. Please try again.");
-        }
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
-    }
+    dispatch(login(body)).then((res) => {
+      const name = res.payload.name;
+      Toast("success",`Hi ${name}, Welcome Back`)
+      window.location.reload();
+    });
   };
-
   const handleForget = async () => {
     try {
       const rawData = { email: forgotEmail };
-      const result = await authServices.forget(rawData);
-      console.log(result);
-      toast.success("Reset link sent to your email!");
+      dispatch(forgetPassword(rawData));
+  Toast("success","Reset link sent to your email!")
+      // toast.success("Reset link sent to your email!");
       setForgotEmail("");
       const modalInstance = Modal.getInstance(modalRef.current);
       if (modalInstance) {
@@ -96,7 +76,8 @@ export const Login = ({ onSuccess }) => {
   const containerStyle = {
     minHeight: "100vh",
     // background: "linear-gradient(to right, #0f0c29, #302b63, #24243e)",
-    backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    backgroundImage: "linear-gradient(346deg, #667eea 0%, #764ba2 100%)",
+
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -169,9 +150,11 @@ export const Login = ({ onSuccess }) => {
                 </a>
               </Typography>
 
-              <button type="submit" className="btn btn-success w-100 mt-3">
-                Log In
-              </button>
+              <CommonButton
+                title="Log In"
+                type="submit"
+                className="btn btn-success w-100 mt-3"
+              ></CommonButton>
             </Form>
           )}
         </Formik>
@@ -204,12 +187,13 @@ export const Login = ({ onSuccess }) => {
               <h5 className="modal-title" id="forgotPasswordModalLabel">
                 Forgot Password
               </h5>
-              <button
+
+              <CommonButton
                 type="button"
                 className="btn-close"
-                data-bs-dismiss="modal"
+                dataAction="modal"
                 aria-label="Close"
-              ></button>
+              ></CommonButton>
             </div>
             <div className="modal-body">
               <input
@@ -218,23 +202,23 @@ export const Login = ({ onSuccess }) => {
                 placeholder="Enter your email"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
+                required
               />
             </div>
             <div className="modal-footer">
-              <button
+              <CommonButton
                 type="button"
                 className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <button
+                dataAction="modal"
+                title="Close"
+              ></CommonButton>
+
+              <CommonButton
                 type="button"
                 className="btn btn-primary"
+                title="Send Reset Link"
                 onClick={handleForget}
-              >
-                Send Reset Link
-              </button>
+              ></CommonButton>
             </div>
           </div>
         </div>

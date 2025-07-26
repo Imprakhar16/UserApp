@@ -1,28 +1,27 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { authServices } from "../../service/authServices";
+import { useDispatch } from "react-redux";
+import { verify } from "../../features/auth/verifyEmailSlice";
+import CommonButton from "../../components/button";
+import { Toast } from "../../components/toastComponent";
 
 export const Verify = () => {
   const navigate = useNavigate();
   const { email, token, id } = useParams();
+  const dispatch = useDispatch();
 
   const handleVerify = async () => {
     try {
-      const result = await authServices.verifyEmail(token, id);
-      console.log(result);
-      if (result.message === "Email verified successfully") {
-        toast.success("email verified successfully , Please Login");
-        // setTimeout(() => {
-        navigate("/login");
-        // }, 2000);
-      }
+      dispatch(verify(token, id));
+      
+Toast("success","email verified successfully , Please Login")
+      navigate("/login");
     } catch (e) {
       console.log(e.response);
     }
   };
 
-  // console.log(email,"",id,"",token);
   return (
     <>
       <center>
@@ -35,9 +34,8 @@ export const Verify = () => {
           />
           <br />
           <br />
-          <button onClick={handleVerify} class="btn btn-outline-success">
-            Verify Email
-          </button>
+        
+          <CommonButton  title='Verify Email' onClick={handleVerify} class="btn btn-outline-success"> </CommonButton>
         </div>
       </center>
     </>

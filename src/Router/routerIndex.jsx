@@ -1,7 +1,6 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-import PrivateRoute from "./privateRoutes.jsx";
 import PublicRoute from "./publicRoutes.jsx";
 
 import { Login } from "../pages/auth/LoginForm.jsx";
@@ -10,6 +9,9 @@ import { UserList } from "../pages/users/UserLIst.jsx";
 import { Verify } from "../pages/auth/VerifyEmail.jsx";
 import { UserDetail } from "../pages/users/UserDetail.jsx";
 import { ResetPassword } from "../pages/auth/ResetPassword.jsx";
+import PrivateRoute from "./privateRoutes.jsx";
+import HomePage from "../pages/users/homePage.jsx";
+
 
 const router = (setToken) =>
   createBrowserRouter([
@@ -17,7 +19,11 @@ const router = (setToken) =>
       element: <PrivateRoute></PrivateRoute>,
       children: [
         {
-          path: "/",
+          path:"/",
+          element:<HomePage></HomePage>
+        },
+        {
+          path: "/userlist",
           element: <UserList onSignOut={setToken} />,
         },
         {

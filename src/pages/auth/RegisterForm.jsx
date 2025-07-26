@@ -2,12 +2,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { Typography } from "@material-tailwind/react";
-import { toast } from "react-toastify";
 
-import { authServices } from "../../service/authServices";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../../features/auth/registerSlice";
+
+import CommonButton from "../../components/button";
+import { Toast } from "../../components/toastComponent";
 
 export const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const initialState = { name: "", email: "", password: "" };
 
@@ -24,24 +28,22 @@ export const Register = () => {
   };
 
   const handleSave = async (values) => {
-    try {
-      const result = await authServices.register({
+    dispatch(
+      registerUser({
         name: values.name,
         email: values.email,
         password: values.password,
-      });
-      const { emailVerificationTOken, id, name } = result.data;
-      console.log(result);
-
-      toast.success(`Hi ${name}, please verify your email.`);
-      // setTimeout(() => {
+      })
+    ).then((res) => {
+      console.log(res);
+      const { emailVerificationTOken, id } = res.payload;
+      Toast("success",`Hi ${name}, please verify your email.`)
+   //   toast.success(`Hi ${name}, please verify your email.`);
       navigate(`/verification/${values.email}/${emailVerificationTOken}/${id}`);
-      // }, 2000);
-    } catch (e) {
-      console.log(e.response || e.message);
-    }
+    });
   };
 
+  
   const containerStyle = {
     minHeight: "100vh",
     background: "linear-gradient(to right, #0f0c29, #302b63, #24243e)",
@@ -115,9 +117,8 @@ export const Register = () => {
                   )}
                 </div>
                 <br />
-                <button type="submit" className="btn btn-success">
-                  Register
-                </button>
+                
+                <CommonButton  title='Register ' type="submit" className="btn btn-success"></CommonButton>
               </Form>
             )}
           </Formik>
