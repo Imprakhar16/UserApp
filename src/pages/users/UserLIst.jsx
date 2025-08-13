@@ -9,7 +9,7 @@ import { CommonModal } from "../../components/modal.jsx";
 import "./userList.css"; 
 import { updateUser } from "../../features/user/fetchDetailSlice.js";
 
-const UserDetail = lazy(() => import("./UserDetail.jsx"));
+const userDetail = lazy(() => import("./userDetail.jsx"));
 
 export const UserList = () => {
   const [page, setPage] = useState(1);
@@ -176,7 +176,7 @@ export const UserList = () => {
                 }
               >
                 <Suspense fallback={<div>Loading user detail...</div>}>
-                  <UserDetail user={modalState.user} />
+                  <userDetail user={modalState.user} />
                 </Suspense>
               </CommonModal>
             ) : (
