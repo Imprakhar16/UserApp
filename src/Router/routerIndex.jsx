@@ -5,7 +5,7 @@ import PublicRoute from "./publicRoutes.jsx";
 
 import { Login } from "../pages/auth/LoginForm.jsx";
 import { Register } from "../pages/auth/RegisterForm.jsx";
-import { UserList } from "../pages/users/UserLIst.jsx";
+import { UserList } from "../pages/users/userList.jsx";
 import { Verify } from "../pages/auth/VerifyEmail.jsx";
 import { ResetPassword } from "../pages/auth/ResetPassword.jsx";
 import PrivateRoute from "./privateRoutes.jsx";

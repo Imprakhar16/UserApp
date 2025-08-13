@@ -1,13 +1,13 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUser, removeUser } from "../../features/user/showUserSlice";
-import CommonButton from "../../components/button";
-import CommonTable from "../../components/table";
-import { Toast } from "../../components/toastComponent";
-import { CommonModal } from "../../components/modal";
+import { fetchUser, removeUser } from "../../features/user/showUserSlice.js";
+import CommonButton from "../../components/button.jsx";
+import CommonTable from "../../components/table.jsx";
+import { Toast } from "../../components/toastComponent.jsx";
+import { CommonModal } from "../../components/modal.jsx";
 
 import "./userList.css"; 
-import { updateUser } from "../../features/user/fetchDetailSlice";
+import { updateUser } from "../../features/user/fetchDetailSlice.js";
 
 const UserDetail = lazy(() => import("./UserDetail.jsx"));
 
