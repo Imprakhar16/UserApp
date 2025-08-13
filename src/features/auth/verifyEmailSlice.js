@@ -6,6 +6,7 @@ import { authServices } from "../../service/authServices";
 const verify = createAsyncThunk("auth/verify", async (body, thunkAPI) => {
   try {
     const { token, id } = body;
+    console.log(token,"",id)
     const response = await authServices.verifyEmail(token, id);
     return response.data;
   } catch (error) {

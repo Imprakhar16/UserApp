@@ -9,7 +9,7 @@ import { CommonModal } from "../../components/modal.jsx";
 import "./userList.css"; 
 import { updateUser } from "../../features/user/fetchDetailSlice.js";
 
-const userDetail = lazy(() => import("./userDetail.jsx"));
+const UserDetail = lazy(() => import("./userDetail.jsx"));
 
 const UserList = () => {
   const [page, setPage] = useState(1);
@@ -21,7 +21,8 @@ const UserList = () => {
   });
 
   const dispatch = useDispatch();
-  const { users, totalUsers, loading } = useSelector((state) => state.getUsers);
+  const { users, totalUsers, loading,deleteUserLoading } = useSelector((state) => state.getUsers);
+
 
   const fetchUsers = async (pageNumber) => {
     try {
@@ -149,13 +150,14 @@ const UserList = () => {
                   <>
                     <CommonButton
                       title="Cancel"
-                      className="glass-btn btn-secondary"
+                      className="btn btn-secondary"
                       onClick={handleModalClose}
                     />
                     <CommonButton
-                      title="Delete User"
-                      className="glass-btn btn-danger"
+                      title={deleteUserLoading ? "deleting..." : "Delete User"}
+                      className="btn btn-danger"
                       onClick={confirmDelete}
+                      disabled={deleteUserLoading}
                     />
                   </>
                 }
@@ -176,7 +178,7 @@ const UserList = () => {
                 }
               >
                 <Suspense fallback={<div>Loading user detail...</div>}>
-                  <userDetail user={modalState.user} />
+                  <UserDetail user={modalState.user} />
                 </Suspense>
               </CommonModal>
             ) : (

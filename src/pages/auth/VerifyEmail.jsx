@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { verify } from "../../features/auth/verifyEmailSlice";
 import CommonButton from "../../components/button";
 import { Toast } from "../../components/toastComponent";
@@ -11,11 +10,12 @@ export const Verify = () => {
   const { email, token, id } = useParams();
   const dispatch = useDispatch();
 
+  const { loading } = useSelector((state) => state.verifyEmail);
   const handleVerify = async () => {
     try {
-      dispatch(verify(token, id));
-      
-Toast("success","email verified successfully , Please Login")
+      dispatch(verify({ token, id }));
+
+      Toast("success", "email verified successfully , Please Login");
       navigate("/login");
     } catch (e) {
       console.log(e.response);
@@ -34,8 +34,15 @@ Toast("success","email verified successfully , Please Login")
           />
           <br />
           <br />
-        
-          <CommonButton  title='Verify Email' onClick={handleVerify} class="btn btn-outline-success"> </CommonButton>
+
+          <CommonButton
+            title={loading ? "Verifying ..." : "Verify Email"}
+            onClick={handleVerify}
+            className="btn btn-success"
+            disabled={loading}
+          >
+            {" "}
+          </CommonButton>
         </div>
       </center>
     </>

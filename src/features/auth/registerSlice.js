@@ -8,7 +8,6 @@ const registerUser = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const response = await authServices.register(credentials);
-      console.log(response);
       return response.data;
     } catch (error) {
     toast.error("user is already exist")

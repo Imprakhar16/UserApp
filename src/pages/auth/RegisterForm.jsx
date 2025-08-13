@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { Typography } from "@material-tailwind/react";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../features/auth/registerSlice";
 
 import CommonButton from "../../components/button";
@@ -14,6 +14,8 @@ export const Register = () => {
   const dispatch = useDispatch();
 
   const initialState = { name: "", email: "", password: "" };
+
+  const {loading} = useSelector(state=> state.register)
 
   const validate = (values) => {
     const errors = {};
@@ -83,7 +85,7 @@ export const Register = () => {
                   <Field
                     type="text"
                     name="name"
-                    className="form-control w-50"
+                    className="form-control w-80"
                     placeholder="Enter a name"
                   />
                   {errors.name && touched.name && (
@@ -96,7 +98,7 @@ export const Register = () => {
                   <Field
                     type="email"
                     name="email"
-                    className="form-control w-50"
+                    className="form-control w-80"
                     placeholder="Enter Email"
                   />
                   {errors.email && touched.email && (
@@ -109,7 +111,7 @@ export const Register = () => {
                   <Field
                     type="password"
                     name="password"
-                    className="form-control w-50"
+                    className="form-control w-80"
                     placeholder="Enter Password"
                   />
                   {errors.password && touched.password && (
@@ -118,7 +120,7 @@ export const Register = () => {
                 </div>
                 <br />
                 
-                <CommonButton  title='Register ' type="submit" className="btn btn-success"></CommonButton>
+                <CommonButton  title={loading ? "registering ..." : "Register user"} type="submit" disabled={loading} className="btn btn-success"></CommonButton>
               </Form>
             )}
           </Formik>

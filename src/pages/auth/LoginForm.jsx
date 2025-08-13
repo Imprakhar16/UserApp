@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { Typography } from "@material-tailwind/react";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../features/auth/loginSlice";
 import { forgetPassword } from "../../features/auth/forgetPassSlice";
 import CommonButton from "../../components/button";
@@ -22,6 +22,8 @@ export const Login = () => {
     email: "",
     password: "",
   };
+
+  const {loading} = useSelector(state => state.login)
 
   const validate = (values) => {
     const errors = {};
@@ -137,9 +139,10 @@ export const Login = () => {
               </Typography>
 
               <CommonButton
-                title="Log In"
+               title={loading ? " logging in ..." : "Log in"}
                 type="submit"
                 className="btn btn-success w-100 mt-3"
+                disabled={loading}
               ></CommonButton>
             </Form>
           )}

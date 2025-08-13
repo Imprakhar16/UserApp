@@ -16,7 +16,7 @@ export const fetchUser = createAsyncThunk(
 export const removeUser = createAsyncThunk(
   "user/removeUser",
   async (id, thunkAPI) => {
-    try {  
+    try {
       const response = await userServices.deleteUser(id);
       return { id };
     } catch (error) {
@@ -30,6 +30,7 @@ const userSlice = createSlice({
   initialState: {
     users: [],
     loading: true,
+    deleteUserLoading: false,
     totalUsers: 0,
     error: null,
   },
@@ -53,13 +54,18 @@ const userSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
+      .addCase(removeUser.pending, (state) => {
+        state.deleteUserLoading = true;
+      })
       .addCase(removeUser.fulfilled, (state, action) => {
-        state.users = state.users.filter(user => user.id !== action.payload.id);
-        state.loading = false;
+        state.users = state.users.filter(
+          (user) => user.id !== action.payload.id
+        );
+        state.deleteUserLoading = false;
       })
       .addCase(removeUser.rejected, (state, action) => {
         state.error = action.payload;
-        state.loading = false;
+        state.deleteUserLoading = false;
       });
   },
 });

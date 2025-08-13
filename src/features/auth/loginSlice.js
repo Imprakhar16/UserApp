@@ -7,7 +7,6 @@ const token = localStorage.getItem("authToken");
 const login = createAsyncThunk("auth/login", async (credentials, thunkAPI) => {
   try {
     const response = await authServices.LoginUser(credentials);
-    console.log(response);
     localStorage.setItem("authToken", response.data.token);
     return response.data;
   } catch (error) {
@@ -19,7 +18,7 @@ const loginSlice = createSlice({
   initialState: {
     token: token || null,
     isLoggedIn: false,
-    loading: true,
+    loading: false,
     error: null,
   },
   reducers: {
