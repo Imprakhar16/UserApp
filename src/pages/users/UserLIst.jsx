@@ -9,7 +9,7 @@ import { CommonModal } from "../../components/modal";
 import "./userList.css"; 
 import { updateUser } from "../../features/user/fetchDetailSlice";
 
-const UserDetail = lazy(() => import("./userDetail"));
+const UserDetail = lazy(() => import("./UserDetail.jsx"));
 
 export const UserList = () => {
   const [page, setPage] = useState(1);
