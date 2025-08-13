@@ -16,8 +16,9 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
+
   (error) => {
-    return Promise.reject(error);
+    // return Promise.reject(error);
   }
 );
 
@@ -29,7 +30,7 @@ axiosInstance.interceptors.response.use(
     const { response } = error;
     if (response.status === 400) {
       console.log("Unauthorized access");
-      localStorage.removeItem("authToken");
+      // localStorage.removeItem("authToken");
       // window.location.href = "/login";     //used to get or set the URL of the current page.
     }
     return Promise.reject(error);

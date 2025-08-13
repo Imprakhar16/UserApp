@@ -23,7 +23,7 @@ const loginSlice = createSlice({
     error: null,
   },
   reducers: {
-    // login reducers
+   
 
     logout(state) {
       (state.token = null),

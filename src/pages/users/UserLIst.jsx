@@ -1,16 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser, removeUser } from "../../features/user/showUserSlice";
 import CommonButton from "../../components/button";
 import CommonTable from "../../components/table";
 import { Toast } from "../../components/toastComponent";
+import { CommonModal } from "../../components/modal";
+
+import "./userList.css"; 
+import { updateUser } from "../../features/user/fetchDetailSlice";
+
+const UserDetail = lazy(() => import("./userDetail"));
 
 export const UserList = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
+  const [modalState, setModalState] = useState({
+    show: false,
+    type: "",
+    user: null,
+  });
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { users, totalUsers, loading } = useSelector((state) => state.getUsers);
 
@@ -28,85 +37,227 @@ export const UserList = () => {
 
   const totalPages = Math.ceil(totalUsers / pageSize);
 
-  const handleDetails = (i) => {
-    const user = users[i];
-    const id = user.id;
-    navigate(`/user/${id}`);
+  const handleDetails = (id) => {
+    const userDetail = users.find((user) => user.id === id);
+    setModalState({ show: true, type: "detail", user: userDetail });
   };
 
-  const handleDelete = async (i) => {
-    const user = users[i];
-    const id = user.id;
+  const handleUpdate = (id) => {
+    const userToUpdate = users.find((user) => user.id === id);
+    setModalState({ show: true, type: "update", user: userToUpdate });
+  };
 
-    if (confirm(`Are you sure you want to delete ${user.name}?`)) {
-      try {
-        await dispatch(removeUser(id));
-        fetchUsers(page);
-        Toast("success", "User Deleted Successfully");
-      } catch (error) {
-        console.error("Error deleting user:", error);
-        Toast("error", "Error deleting user");
-      }
+  const handleDelete = (id) => {
+    const userToDelete = users.find((user) => user.id === id);
+    setModalState({ show: true, type: "delete", user: userToDelete });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await dispatch(removeUser(modalState.user.id));
+      Toast("success", "User Deleted Successfully");
+      setModalState({ show: false, user: null });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      Toast("error", "Error deleting user");
     }
   };
 
+  const handleModalClose = () => {
+    setModalState({ show: false, type: "", user: null });
+  };
+  const tableHeaders = ["S.no", "Name", "Email", "Actions"];
   return (
-    <div className="container mt-4" style={{ paddingTop: '90px', paddingLeft: '20px' }}>
-      <h2 className="mb-4">👤User List</h2>
+    <div className="page-background">
+      <div className="glass-container">
+        <h2 className="mb-4">👤 User List</h2>
 
-      <CommonTable headers={["S.no", "Name", "Email", "Actions"]} loading={loading}>
-        {loading ? (
-          <tr>
-            <td colSpan="4" className="text-center">
-              Loading users...
-            </td>
-          </tr>
-        ) : users && users.length > 0 ? (
-          users.map((user, index) => (
-            <tr key={user.id}>
-              <td>{index + 1}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>
-                <CommonButton onClick={() => handleDetails(index)} className="btn btn-primary me-2" title="Details"></CommonButton>
-                <CommonButton title="Delete" onClick={() => handleDelete(index)} className="btn btn-danger"></CommonButton>
+        <CommonTable
+          headers={tableHeaders}
+          loading={loading}
+          className="glass-table"
+        >
+          {users && users.length > 0 ? (
+            users.map((user, index) => (
+              <tr
+                key={user.id}
+                onClick={() => handleDetails(user.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>{index + 1}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>
+                  <CommonButton
+                    onClick={() => handleDetails(user.id)}
+                    className="btn btn-primary"
+                    title="Details"
+                  /> 
+                  <CommonButton
+                    onClick={(e) => (e.stopPropagation(), handleDelete(user.id))}
+                    className=" btn btn-danger"
+                    title="Delete"
+                    style={{marginLeft:"10px"}}
+                  />
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="text-center">
+                No users available.
               </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="4" className="text-center">
-              No users available.
-            </td>
-          </tr>
-        )}
-      </CommonTable>
+          )}
+        </CommonTable>
 
-      <nav aria-label="User list pagination">
-        <ul className="pagination justify-content-center">
-          <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <CommonButton
-              className="page-link"
-              onClick={() => setPage(page - 1)}
-              disabled={page === 1}
-              title="Previous"
-            ></CommonButton>
-          </li>
-          <li className="page-item disabled">
-            <span className="page-link">
-              Page {page} of {totalPages}
-            </span>
-          </li>
-          <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-            <CommonButton
-              className="page-link"
-              onClick={() => setPage(page + 1)}
-              disabled={page === totalPages}
-              title="Next"
-            ></CommonButton>
-          </li>
-        </ul>
-      </nav>
+        {/* pagination */}
+        <nav aria-label="User list pagination">
+          <ul className="pagination justify-content-center mt-4">
+            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+              <CommonButton
+                className="page-link glass-btn"
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                title="Previous"
+              />
+            </li>
+            <li className="page-item disabled">
+              <span className="page-link text-white bg-transparent border-0">
+                Page {page} of {totalPages}
+              </span>
+            </li>
+            <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+              <CommonButton
+                className="page-link glass-btn"
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages}
+                title="Next"
+              />
+            </li>
+          </ul>
+        </nav>
+
+        {/* Modals */}
+        {modalState.show && modalState.user && (
+          <>
+            {modalState.type === "delete" ? (
+              <CommonModal
+                close={handleModalClose}
+                modalTitle="Delete User"
+                modalFooter={
+                  <>
+                    <CommonButton
+                      title="Cancel"
+                      className="glass-btn btn-secondary"
+                      onClick={handleModalClose}
+                    />
+                    <CommonButton
+                      title="Delete User"
+                      className="glass-btn btn-danger"
+                      onClick={confirmDelete}
+                    />
+                  </>
+                }
+              >
+                <p>Are you sure you want to delete this user?</p>
+              </CommonModal>
+            ) : modalState.type === "detail" ? (
+              <CommonModal
+                style={{ display: "flex", justifyContent: "center" }}
+                close={handleModalClose}
+                modalTitle="User Detail"
+                modalFooter={
+                  <CommonButton
+                    title="Update User"
+                    className="btn btn-warning"
+                    onClick={() => handleUpdate(modalState.user.id)}
+                  />
+                }
+              >
+                <Suspense fallback={<div>Loading user detail...</div>}>
+                  <UserDetail user={modalState.user} />
+                </Suspense>
+              </CommonModal>
+            ) : (
+              <CommonModal
+              close={handleModalClose}
+              modalTitle="Update User"
+              modalFooter={null}
+            >
+              <form
+  onSubmit={(e) => {
+    e.preventDefault();
+    const updatedUser = {
+      name: e.target.name.value,
+      email: e.target.email.value,
+      password: e.target.password.value,
+    };
+
+    dispatch(updateUser({ id: modalState.user.id, formData: updatedUser }))
+      .unwrap()
+      .then(() => {
+        Toast("success", "User updated successfully!");
+        handleModalClose();
+        fetchUsers(page);
+      })
+      .catch((err) => {
+        Toast("error", err.message || "Failed to update user.");
+      });
+  }}
+>
+                <div className="mb-3">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    defaultValue={modalState.user.name}
+                    className="form-control"
+                    required
+                  />
+                </div>
+            
+                <div className="mb-3">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    defaultValue={modalState.user.email}
+                    className="form-control"
+                    disabled
+                  />
+                </div>
+            
+                <div className="mb-3">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    className="form-control"
+                    placeholder="Enter new password"
+                  />
+                </div>
+            
+                <div className="d-flex justify-content-end gap-2">
+                  <CommonButton
+                    type="button"
+                    className="btn btn-secondary"
+                    title="Cancel"
+                    onClick={handleModalClose}
+                  />
+                  <CommonButton
+                    type="submit"
+                    className="btn btn-success"
+                    title="Save Changes"
+                  />
+                </div>
+              </form>
+            </CommonModal>
+            
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

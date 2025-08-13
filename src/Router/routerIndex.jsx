@@ -7,11 +7,9 @@ import { Login } from "../pages/auth/LoginForm.jsx";
 import { Register } from "../pages/auth/RegisterForm.jsx";
 import { UserList } from "../pages/users/UserLIst.jsx";
 import { Verify } from "../pages/auth/VerifyEmail.jsx";
-import { UserDetail } from "../pages/users/UserDetail.jsx";
 import { ResetPassword } from "../pages/auth/ResetPassword.jsx";
 import PrivateRoute from "./privateRoutes.jsx";
 import HomePage from "../pages/users/homePage.jsx";
-
 
 const router = (setToken) =>
   createBrowserRouter([
@@ -19,16 +17,12 @@ const router = (setToken) =>
       element: <PrivateRoute></PrivateRoute>,
       children: [
         {
-          path:"/",
-          element:<HomePage></HomePage>
+          path: "/",
+          element: <HomePage></HomePage>,
         },
         {
           path: "/userlist",
           element: <UserList onSignOut={setToken} />,
-        },
-        {
-          path: "/user/:id",
-          element: <UserDetail />,
         },
       ],
     },

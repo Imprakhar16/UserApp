@@ -6,7 +6,7 @@ export const fetchUser = createAsyncThunk(
   async ({ pageNumber, pageSize }, thunkAPI) => {
     try {
       const response = await userServices.userFetch(pageNumber, pageSize);
-      return response.data;
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -45,7 +45,7 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
-        state.users = action.payload || [];
+        state.users = action.payload.data || [];
         state.totalUsers = action.payload.totalRecords || 0;
         state.loading = false;
       })

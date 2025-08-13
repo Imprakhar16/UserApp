@@ -1,25 +1,22 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
 import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
-import { Modal } from "bootstrap";
-
-// import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Typography } from "@material-tailwind/react";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { login } from "../../features/auth/loginSlice";
 import { forgetPassword } from "../../features/auth/forgetPassSlice";
 import CommonButton from "../../components/button";
 import { Toast } from "../../components/toastComponent";
+import { CommonModal } from "../../components/modal";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const [forgotEmail, setForgotEmail] = useState("");
   const dispatch = useDispatch();
-  const modalRef = useRef();
+
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const initialState = {
     email: "",
@@ -46,38 +43,28 @@ export const Login = () => {
     };
 
     dispatch(login(body)).then((res) => {
+      console.log(res);
       const name = res.payload.name;
-      Toast("success",`Hi ${name}, Welcome Back`)
-      window.location.reload();
+      Toast("success", `Hi ${name}, Welcome Back`);
+      navigate("/");
     });
   };
+
   const handleForget = async () => {
     try {
       const rawData = { email: forgotEmail };
       dispatch(forgetPassword(rawData));
-  Toast("success","Reset link sent to your email!")
-      // toast.success("Reset link sent to your email!");
+      Toast("success", "Reset link sent to your email!");
       setForgotEmail("");
-      const modalInstance = Modal.getInstance(modalRef.current);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
-
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-      document.body.classList.remove("modal-open");
-      document.body.style = "";
+      setShowModal(false); 
     } catch (error) {
-      toast.error("Failed to send reset link.");
-      console.log(error);
+      console.error("Failed to send reset link.", error);
     }
   };
 
   const containerStyle = {
     minHeight: "100vh",
-    // background: "linear-gradient(to right, #0f0c29, #302b63, #24243e)",
     backgroundImage: "linear-gradient(346deg, #667eea 0%, #764ba2 100%)",
-
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -140,14 +127,13 @@ export const Login = () => {
                 color="white"
                 className="mt-2 text-center font-normal"
               >
-                <a
-                  href="#"
+                <span
                   className="text-white"
-                  data-bs-toggle="modal"
-                  data-bs-target="#forgotPasswordModal"
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                  onClick={() => setShowModal(true)}
                 >
                   Forget Password?
-                </a>
+                </span>
               </Typography>
 
               <CommonButton
@@ -161,68 +147,45 @@ export const Login = () => {
 
         <Typography color="white" className="mt-3 text-center font-normal">
           Don't have an account?{" "}
-          <a
-            href="#"
+          <span
             className="text-white fw-bold"
+            style={{ cursor: "pointer" }}
             onClick={() => navigate("/register")}
           >
             Register Here
-          </a>
+          </span>
         </Typography>
       </div>
 
-      {/* //forget popup modal */}
-
-      <div
-        className="modal fade"
-        id="forgotPasswordModal"
-        tabIndex="-1"
-        aria-labelledby="forgotPasswordModalLabel"
-        aria-hidden="true"
-        ref={modalRef}
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="forgotPasswordModalLabel">
-                Forgot Password
-              </h5>
-
-              <CommonButton
-                type="button"
-                className="btn-close"
-                dataAction="modal"
-                aria-label="Close"
-              ></CommonButton>
-            </div>
-            <div className="modal-body">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Enter your email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="modal-footer">
-              <CommonButton
-                type="button"
-                className="btn btn-secondary"
-                dataAction="modal"
-                title="Close"
-              ></CommonButton>
-
-              <CommonButton
-                type="button"
-                className="btn btn-primary"
-                title="Send Reset Link"
-                onClick={handleForget}
-              ></CommonButton>
-            </div>
+      {showModal && (
+        <CommonModal modalTitle="Forgot Password" close={setShowModal}>
+          <div className="mb-3">
+            <label>Enter your email:</label>
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
-      </div>
+          <div className="d-flex justify-content-end gap-2">
+            <CommonButton
+              type="button"
+              className="btn btn-secondary"
+              title="Cancel"
+              onClick={() => setShowModal(false)}
+            />
+            <CommonButton
+              type="button"
+              className="btn btn-primary"
+              title="Send Reset Link"
+              onClick={handleForget}
+            />
+          </div>
+        </CommonModal>
+      )}
     </div>
   );
 };

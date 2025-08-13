@@ -7,7 +7,6 @@ export const fetchUserDetail = createAsyncThunk(
   "user/fetchUserDetail",
   async (id, thunkAPI) => {
     try {
-      console.log(id);
       const response = await userServices.userDetail(id);
       return response;
     } catch (error) {
@@ -21,9 +20,11 @@ export const fetchUserDetail = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "user/updateUser",
   async ({ id, formData }, thunkAPI) => {
+    console.log(formData);
     try {
-      console.log(id);
+     
       const response = await axiosInstance.put(`user/${id}`, formData);
+      console.log(response);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -54,7 +55,6 @@ const userDetailSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserDetail.fulfilled, (state, action) => {
-        console.log(action);
         state.loading = false;
         state.user = action.payload.user;
       })
