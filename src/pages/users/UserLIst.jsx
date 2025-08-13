@@ -11,7 +11,7 @@ import { updateUser } from "../../features/user/fetchDetailSlice.js";
 
 const userDetail = lazy(() => import("./userDetail.jsx"));
 
-export const UserList = () => {
+const UserList = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [modalState, setModalState] = useState({
@@ -261,3 +261,5 @@ export const UserList = () => {
     </div>
   );
 };
+
+export default UserList
